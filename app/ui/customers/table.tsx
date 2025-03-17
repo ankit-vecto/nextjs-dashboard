@@ -1,16 +1,12 @@
-import Image from 'next/image';
-import { lusitana } from '@/app/ui/fonts';
-import Search from '@/app/ui/search';
-import {
-  CustomersTableType,
-  FormattedCustomersTable,
-} from '@/app/lib/definitions';
+import { fetchCustomers } from "@/app/lib/data";
+import { CustomerField } from "@/app/lib/definitions";
+import { lusitana } from "@/app/ui/fonts";
+import Search from "@/app/ui/search";
+import Image from "next/image";
 
-export default async function CustomersTable({
-  customers,
-}: {
-  customers: FormattedCustomersTable[];
-}) {
+export default async function CustomersTable() {
+  const allCustomer: CustomerField[] = await fetchCustomers();
+
   return (
     <div className="w-full">
       <h1 className={`${lusitana.className} mb-8 text-xl md:text-2xl`}>
@@ -21,8 +17,9 @@ export default async function CustomersTable({
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full align-middle">
             <div className="overflow-hidden rounded-md bg-gray-50 p-2 md:pt-0">
+              {/* For mobile view */}
               <div className="md:hidden">
-                {customers?.map((customer) => (
+                {allCustomer.map((customer) => (
                   <div
                     key={customer.id}
                     className="mb-2 w-full rounded-md bg-white p-4"
@@ -46,45 +43,23 @@ export default async function CustomersTable({
                         </p>
                       </div>
                     </div>
-                    <div className="flex w-full items-center justify-between border-b py-5">
-                      <div className="flex w-1/2 flex-col">
-                        <p className="text-xs">Pending</p>
-                        <p className="font-medium">{customer.total_pending}</p>
-                      </div>
-                      <div className="flex w-1/2 flex-col">
-                        <p className="text-xs">Paid</p>
-                        <p className="font-medium">{customer.total_paid}</p>
-                      </div>
-                    </div>
-                    <div className="pt-4 text-sm">
-                      <p>{customer.total_invoices} invoices</p>
-                    </div>
                   </div>
                 ))}
               </div>
+              {/* For desktop/tablet view */}
               <table className="hidden min-w-full rounded-md text-gray-900 md:table">
                 <thead className="rounded-md bg-gray-50 text-left text-sm font-normal">
                   <tr>
                     <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                      Name
+                      Customer
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
                       Email
                     </th>
-                    <th scope="col" className="px-3 py-5 font-medium">
-                      Total Invoices
-                    </th>
-                    <th scope="col" className="px-3 py-5 font-medium">
-                      Total Pending
-                    </th>
-                    <th scope="col" className="px-4 py-5 font-medium">
-                      Total Paid
-                    </th>
                   </tr>
                 </thead>
-
                 <tbody className="divide-y divide-gray-200 text-gray-900">
-                  {customers.map((customer) => (
+                  {allCustomer?.map((customer) => (
                     <tr key={customer.id} className="group">
                       <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6">
                         <div className="flex items-center gap-3">
@@ -100,15 +75,6 @@ export default async function CustomersTable({
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                         {customer.email}
-                      </td>
-                      <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                        {customer.total_invoices}
-                      </td>
-                      <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                        {customer.total_pending}
-                      </td>
-                      <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
-                        {customer.total_paid}
                       </td>
                     </tr>
                   ))}
