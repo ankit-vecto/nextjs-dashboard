@@ -1,9 +1,23 @@
+import { fetchFilteredCustomers } from "@/app/lib/data";
 import CustomersTable from "@/app/ui/customers/table";
+import { InvoicesTableSkeleton } from "@/app/ui/skeletons";
+import { Suspense } from "react";
 
-export default function Page() {
+export default async function Page(props: {
+  searchParams?: Promise<{
+    query?: string;
+    page?: string;
+  }>;
+}) {
+  const searchParams = await props.searchParams;
+  const query = searchParams?.query || "";
+  const fetchFilteredCustomer = await fetchFilteredCustomers(query);
+
   return (
-    <div>
-      <CustomersTable />
-    </div>
+    <>
+      <Suspense key={query} fallback={<InvoicesTableSkeleton />}>
+        <CustomersTable fetchFilteredCustomer={fetchFilteredCustomer} />
+      </Suspense>
+    </>
   );
 }

@@ -1,12 +1,13 @@
-import { fetchCustomers } from "@/app/lib/data";
-import { CustomerField } from "@/app/lib/definitions";
+import { CustomersTableType } from "@/app/lib/definitions";
 import { lusitana } from "@/app/ui/fonts";
 import Search from "@/app/ui/search";
 import Image from "next/image";
 
-export default async function CustomersTable() {
-  const allCustomer: CustomerField[] = await fetchCustomers();
-
+export default async function CustomersTable({
+  fetchFilteredCustomer,
+}: {
+  fetchFilteredCustomer: CustomersTableType[];
+}) {
   return (
     <div className="w-full">
       <h1 className={`${lusitana.className} mb-8 text-xl md:text-2xl`}>
@@ -17,36 +18,54 @@ export default async function CustomersTable() {
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full align-middle">
             <div className="overflow-hidden rounded-md bg-gray-50 p-2 md:pt-0">
-              {/* For mobile view */}
+              {/* Mobile View */}
               <div className="md:hidden">
-                {allCustomer.map((customer) => (
+                {fetchFilteredCustomer.map((customer) => (
                   <div
                     key={customer.id}
-                    className="mb-2 w-full rounded-md bg-white p-4"
+                    className="mb-4 w-full rounded-md bg-white p-4"
                   >
-                    <div className="flex items-center justify-between border-b pb-4">
-                      <div>
-                        <div className="mb-2 flex items-center">
-                          <div className="flex items-center gap-3">
-                            <Image
-                              src={customer.image_url}
-                              className="rounded-full"
-                              alt={`${customer.name}'s profile picture`}
-                              width={28}
-                              height={28}
-                            />
-                            <p>{customer.name}</p>
-                          </div>
+                    <div className="flex flex-col gap-4 border-b pb-4">
+                      <div className="flex items-center gap-3">
+                        <Image
+                          src={customer.image_url}
+                          className="rounded-full"
+                          alt={`${customer.name}'s profile picture`}
+                          width={48}
+                          height={48}
+                        />
+                        <div>
+                          <p className="font-medium text-gray-800">
+                            {customer.name}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {customer.email}
+                          </p>
                         </div>
-                        <p className="text-sm text-gray-500">
-                          {customer.email}
-                        </p>
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        <div className="flex justify-between">
+                          <p className="font-medium text-gray-800">Invoices</p>
+                          <p>{customer.total_invoices}</p>
+                        </div>
+                        <div className="flex justify-between">
+                          <p className="font-medium text-gray-800">
+                            Total Pending
+                          </p>
+                          <p>{customer.total_pending}</p>
+                        </div>
+                        <div className="flex justify-between">
+                          <p className="font-medium text-gray-800">
+                            Total Paid
+                          </p>
+                          <p>{customer.total_paid}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-              {/* For desktop/tablet view */}
+              {/* Desktop/Tablet View */}
               <table className="hidden min-w-full rounded-md text-gray-900 md:table">
                 <thead className="rounded-md bg-gray-50 text-left text-sm font-normal">
                   <tr>
@@ -56,12 +75,21 @@ export default async function CustomersTable() {
                     <th scope="col" className="px-3 py-5 font-medium">
                       Email
                     </th>
+                    <th scope="col" className="px-3 py-5 font-medium">
+                      Invoices
+                    </th>
+                    <th scope="col" className="px-3 py-5 font-medium">
+                      Total Pending
+                    </th>
+                    <th scope="col" className="px-3 py-5 font-medium">
+                      Total Paid
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 text-gray-900">
-                  {allCustomer?.map((customer) => (
+                  {fetchFilteredCustomer?.map((customer) => (
                     <tr key={customer.id} className="group">
-                      <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6">
+                      <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black sm:pl-6">
                         <div className="flex items-center gap-3">
                           <Image
                             src={customer.image_url}
@@ -75,6 +103,15 @@ export default async function CustomersTable() {
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                         {customer.email}
+                      </td>
+                      <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                        {customer.total_invoices}
+                      </td>
+                      <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                        {customer.total_pending}
+                      </td>
+                      <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                        {customer.total_paid}
                       </td>
                     </tr>
                   ))}
