@@ -88,3 +88,25 @@ export type InvoiceForm = {
   amount: number;
   status: "pending" | "paid";
 };
+export type Req = {
+  method: string;
+  body: {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  };
+};
+
+export type PathologyReport = {
+  name: string;
+  age: string;
+  gender: string;
+  phone: string;
+  patientId: string;
+  testDate: string;
+  testName: string;
+  collectedBy: string;
+  collectionDate: string;
+  reportDate: string;
+};

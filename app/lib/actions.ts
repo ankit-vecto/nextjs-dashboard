@@ -4,8 +4,9 @@ import { z } from "zod";
 import postgres from "postgres";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { signIn } from "@/auth";
+import signupHandler, { signIn } from "@/auth";
 import { AuthError } from "next-auth";
+import { PathologyReport } from "./definitions";
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 const FormSchema = z.object({
@@ -122,6 +123,8 @@ export async function authenticate(
   prevState: string | undefined,
   formData: FormData
 ) {
+  console.log(formData, "formDataformData");
+
   try {
     await signIn("credentials", formData);
   } catch (error) {
@@ -134,5 +137,66 @@ export async function authenticate(
       }
     }
     throw error;
+  }
+}
+export async function register(
+  prevState: string | undefined,
+  formData: FormData
+) {
+  try {
+    const userDetails = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+      confirmPassword: formData.get("confirmPassword") as string,
+    };
+    const req = {
+      body: userDetails,
+      method: "POST",
+    };
+    if (
+      !userDetails.name ||
+      !userDetails.email ||
+      !userDetails.password ||
+      !userDetails.confirmPassword
+    ) {
+      return "Please fill out all fields.";
+    }
+    if (userDetails.password !== userDetails.confirmPassword) {
+      return "Passwords do not match.";
+    }
+    signupHandler(req);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return "Invalid credentials.";
+        default:
+          return "Something went wrong.";
+      }
+    }
+    throw error;
+  }
+}
+
+export async function handlePathologyReportDetails(formData: PathologyReport) {
+  try {
+    await sql`INSERT INTO pathology_reports (
+            name, age, gender, phone, patient_id, test_date, test_name, 
+            collected_by, collection_date, report_date
+        ) VALUES (
+            ${formData.name},
+            ${formData.age},
+            ${formData.gender},
+            ${formData.phone},
+            ${formData.patientId || null},
+            ${formData.testDate},
+            ${formData.testName},
+            ${formData.collectedBy},
+            ${formData.collectionDate},
+            ${formData.reportDate}
+        )`;
+  } catch (error) {
+    console.error("Error storing pathology report:", error);
   }
 }
