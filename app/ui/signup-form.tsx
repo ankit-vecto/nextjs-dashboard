@@ -91,7 +91,7 @@ export default function SignupForm() {
           confirmPassword: "",
         });
         if (isPending) {
-          if (!errorMessage) {
+          if (errorMessage == "User created successfully") {
             navigation.push("/login");
           }
         }
