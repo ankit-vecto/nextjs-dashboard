@@ -14,7 +14,6 @@ const registerSchema = z.object({
 });
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
-
 async function getUser(email: string): Promise<User | undefined> {
   try {
     const user = await sql<User[]>`SELECT * FROM users WHERE email=${email}`;
@@ -45,33 +44,19 @@ export const { auth, signIn, signOut } = NextAuth({
   ],
 });
 
-export default async function signupHandler(
-  req: Req
-  // res: NextApiResponse
-): Promise<void> {
+export default async function signupHandler(req: Req): Promise<string | void> {
   if (req.method !== "POST") {
-    alert("method not supported");
-    return;
+    throw new Error("Method not supported");
   }
   const parsedData = registerSchema.safeParse(req.body);
   if (!parsedData.success) {
-    alert("Invalid input data");
-    return;
+    return "Invalid input data";
   }
   const { email, password, name } = parsedData.data;
-  try {
-    const existingUser = await getUser(email);
-    if (existingUser) {
-      alert("Email already exists");
-      return;
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await sql`INSERT INTO users (email, password, name) VALUES (${email}, ${hashedPassword}, ${name})`;
-    alert("User created successfully");
-    return;
-  } catch (error) {
-    console.error("Registration error:", error);
-    alert("Internal server error");
-    return;
+  if (await getUser(email)) {
+    return "Email is already in use";
   }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await sql`INSERT INTO users (email, password, name) VALUES (${email}, ${hashedPassword}, ${name})`;
+  return "User created successfully";
 }

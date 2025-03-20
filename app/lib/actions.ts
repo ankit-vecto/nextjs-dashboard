@@ -143,42 +143,21 @@ export async function register(
   prevState: string | undefined,
   formData: FormData
 ) {
-  try {
-    const userDetails = {
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      password: formData.get("password") as string,
-      confirmPassword: formData.get("confirmPassword") as string,
-    };
-    const req = {
-      body: userDetails,
-      method: "POST",
-    };
-    if (
-      !userDetails.name ||
-      !userDetails.email ||
-      !userDetails.password ||
-      !userDetails.confirmPassword
-    ) {
-      return "Please fill out all fields.";
-    }
-    if (userDetails.password !== userDetails.confirmPassword) {
-      return "Passwords do not match.";
-    }
-    signupHandler(req);
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          return "Invalid credentials.";
-        default:
-          return "Something went wrong.";
-      }
-    }
-    throw error;
+  const userDetails = {
+    name: formData.get("name") as string,
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+    confirmPassword: formData.get("confirmPassword") as string,
+  };
+  const req = {
+    body: userDetails,
+    method: "POST",
+  };
+  const response = await signupHandler(req);
+  if (response) {
+    return response;
   }
 }
-
 export async function handlePathologyReportDetails(formData: PathologyReport) {
   try {
     await sql`INSERT INTO pathology_reports (
@@ -196,6 +175,7 @@ export async function handlePathologyReportDetails(formData: PathologyReport) {
             ${formData.collectionDate},
             ${formData.reportDate}
         )`;
+    return "Pathology report stored successfully.";
   } catch (error) {
     console.error("Error storing pathology report:", error);
   }
