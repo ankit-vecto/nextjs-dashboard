@@ -1,28 +1,34 @@
 "use client";
-
-import { handlePathologyReportDetails } from "@/app/lib/actions";
-import { PathologyReport } from "@/app/lib/definitions";
-import Link from "next/link";
+import { PathologyReport, PathologyUpdatedReport } from "@/app/lib/definitions";
 import { useRouter } from "next/navigation";
-import { useState, ChangeEvent, FormEvent } from "react";
-import { z } from "zod";
+import React, { ChangeEvent, FormEvent, useState } from "react";
 import { pathologySchema } from "../validationSchema";
+import { z } from "zod";
+import Link from "next/link";
+import handleUpdateReport from "@/app/lib/actions";
 
-export default function PathologyForm() {
+const EditReportFrom = ({
+  details,
+  id,
+}: {
+  details: PathologyReport[];
+  id: string;
+}) => {
+  const report = details[0];
   const router = useRouter();
-  const [formData, setFormData] = useState<PathologyReport>({
-    name: "",
-    age: "",
-    gender: "",
-    phone: "",
-    patient_id: "",
-    test_date: "",
-    test_name: "",
-    collected_by: "",
-    collection_date: "",
-    report_date: "",
+  const [formData, setFormData] = useState<PathologyUpdatedReport>({
+    id: id,
+    name: report.name,
+    age: String(report.age),
+    gender: report.gender,
+    phone: report.phone,
+    patient_id: report.patient_id,
+    test_date: new Date(report.test_date).toISOString(),
+    test_name: report.test_name,
+    collected_by: report.collected_by,
+    collection_date: new Date(report.collection_date).toISOString(),
+    report_date: new Date(report.report_date).toISOString(),
   });
-
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -79,20 +85,8 @@ export default function PathologyForm() {
     try {
       pathologySchema.parse(formData);
       setErrors({});
-      await handlePathologyReportDetails(formData).then((res) => {
-        if (res) {
-          setFormData({
-            name: "",
-            age: "",
-            gender: "",
-            phone: "",
-            patient_id: "",
-            test_date: "",
-            test_name: "",
-            collected_by: "",
-            collection_date: "",
-            report_date: "",
-          });
+      handleUpdateReport(formData, id).then((res) => {
+        if (res === "Pathology report updated successfully.") {
           router.push("/dashboard/pathology");
         }
       });
@@ -179,7 +173,7 @@ export default function PathologyForm() {
           <input
             type="text"
             name="patient_id"
-            value={formData.patient_id}
+            value={formData.patient_id || ""}
             onChange={handleChange}
             className="peer block w-full rounded-md border border-gray-200 py-[9px] text-sm outline-2 placeholder:text-gray-500"
           />
@@ -192,7 +186,7 @@ export default function PathologyForm() {
           <input
             type="date"
             name="test_date"
-            value={formData.test_date}
+            value={new Date(formData.test_date).toISOString().split("T")[0]}
             onChange={handleChange}
             max={new Date().toISOString().slice(0, 10)}
             className={`peer block w-full rounded-md border border-gray-200 py-[9px] text-sm outline-2 placeholder:text-gray-500 ${
@@ -246,7 +240,9 @@ export default function PathologyForm() {
           <input
             type="datetime-local"
             name="collection_date"
-            value={formData.collection_date}
+            value={new Date(formData.collection_date)
+              .toISOString()
+              .slice(0, 16)}
             onChange={handleChange}
             className={`peer block w-full rounded-md border border-gray-200 py-[9px] text-sm outline-2 placeholder:text-gray-500 ${
               errors.collection_date && `border-red-500`
@@ -263,13 +259,12 @@ export default function PathologyForm() {
           <input
             type="date"
             name="report_date"
-            value={formData.report_date}
+            value={new Date(formData.report_date).toISOString().split("T")[0]}
             onChange={handleChange}
             className={`peer block w-full rounded-md border border-gray-200 py-[9px] text-sm outline-2 placeholder:text-gray-500 ${
               errors.report_date && `border-red-500`
             }`}
           />
-
           {errors.report_date && (
             <span style={{ color: "red" }}>{errors.report_date}</span>
           )}
@@ -286,9 +281,10 @@ export default function PathologyForm() {
           type="submit"
           className=" bg-blue-500 text-white p-2 rounded-lg mt-4"
         >
-          Submit Report
+          Save Report
         </button>
       </div>
     </form>
   );
-}
+};
+export default EditReportFrom;

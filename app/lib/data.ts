@@ -5,6 +5,8 @@ import {
   InvoiceForm,
   InvoicesTable,
   LatestInvoiceRaw,
+  PathologyReport,
+  PathologyUpdatedReport,
   Revenue,
 } from "./definitions";
 import { formatCurrency } from "./utils";
@@ -212,5 +214,76 @@ export async function fetchFilteredCustomers(query: string) {
   } catch (err) {
     console.error("Database Error:", err);
     throw new Error("Failed to fetch customer table.");
+  }
+}
+
+export async function fetchPathologyReports(
+  query: string,
+  currentPage: number
+): Promise<PathologyUpdatedReport[]> {
+  try {
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+    const reports = await sql<PathologyUpdatedReport[]>`
+      SELECT
+        id, 
+        name, 
+        age, 
+        gender, 
+        phone, 
+        patient_id, 
+        test_date, 
+        test_name, 
+        collected_by, 
+        collection_date, 
+        report_date
+      FROM pathology_reports
+      WHERE
+        name ILIKE ${`%${query}%`} OR
+        patient_id::text ILIKE ${`%${query}%`} OR
+        test_name ILIKE ${`%${query}%`} OR
+        collected_by ILIKE ${`%${query}%`}
+        ORDER BY name ASC
+        LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+    return reports;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Failed to fetch pathology reports.");
+  }
+}
+
+export async function fetchReportsPages(query: string): Promise<number> {
+  try {
+    const data = await sql<{ count: number }[]>`
+      SELECT COUNT(*) AS count
+      FROM pathology_reports
+      WHERE
+        name ILIKE ${`%${query}%`} OR
+        patient_id::text ILIKE ${`%${query}%`} OR
+        test_name ILIKE ${`%${query}%`} OR
+        collected_by ILIKE ${`%${query}%`}
+    `;
+    const totalRecords = Number(data[0]?.count || 0);
+    const totalPages = Math.ceil(totalRecords / ITEMS_PER_PAGE);
+
+    return totalPages;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch the total number of pages.");
+  }
+}
+
+export async function fetchReportDetailsById(id: string) {
+  try {
+    const report = await sql<PathologyReport[]>`
+      SELECT *
+      FROM pathology_reports
+      WHERE id = ${id}
+    `;
+    return report[0];
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Failed to fetch report details.");
   }
 }

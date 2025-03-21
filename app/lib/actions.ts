@@ -168,15 +168,50 @@ export async function handlePathologyReportDetails(formData: PathologyReport) {
             ${formData.age},
             ${formData.gender},
             ${formData.phone},
-            ${formData.patientId || null},
-            ${formData.testDate},
-            ${formData.testName},
-            ${formData.collectedBy},
-            ${formData.collectionDate},
-            ${formData.reportDate}
+            ${formData.patient_id || null},
+            ${formData.test_date},
+            ${formData.test_name},
+            ${formData.collected_by},
+            ${formData.collection_date},
+            ${formData.report_date}
         )`;
     return "Pathology report stored successfully.";
   } catch (error) {
     console.error("Error storing pathology report:", error);
+  }
+}
+
+export default async function handleUpdateReport(
+  report: PathologyReport,
+  id: string
+) {
+  console.log(report, "update");
+
+  try {
+    await sql`UPDATE pathology_reports SET
+            name = ${report.name},
+            age = ${report.age},
+            gender = ${report.gender},
+            phone = ${report.phone},
+            patient_id = ${report.patient_id || null},
+            test_date = ${report.test_date},
+            test_name = ${report.test_name},
+            collected_by = ${report.collected_by},
+            collection_date = ${report.collection_date},
+            report_date = ${report.report_date}
+        WHERE id = ${id}`;
+    return "Pathology report updated successfully.";
+  } catch (error) {
+    console.error("Error updating pathology report:", error);
+  }
+}
+
+export async function deleteReport(id: string) {
+  try {
+    await sql`DELETE FROM pathology_reports WHERE id = ${id}`;
+    revalidatePath("/dashboard/pathology");
+  } catch (error) {
+    console.error("Failed to delete report:", error);
+    throw new Error("Failed to delete report.");
   }
 }

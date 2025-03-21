@@ -15,12 +15,12 @@ export const pathologySchema = z.object({
     .min(10, "Phone number must be at least 10 digits")
     .max(10, "Phone number must be exactly 10 digits")
     .regex(/^\d+$/, "Phone number must be numeric"),
-  patientId: z.string().optional(),
-  testDate: z.string().min(1, "Test date is required"),
-  testName: z.string().min(1, "Test name is required"),
-  collectedBy: z.string().min(1, "Collector name is required"),
-  collectionDate: z.string().min(1, "Collection date & time is required"),
-  reportDate: z.string().min(1, "Report date is required"),
+  patient_id: z.string().optional(),
+  test_date: z.string().min(1, "Test date is required"),
+  test_name: z.string().min(1, "Test name is required"),
+  collected_by: z.string().min(1, "Collector name is required"),
+  collection_date: z.string().min(1, "Collection date & time is required"),
+  report_date: z.string().min(1, "Report date is required"),
 });
 export const signupSchema = z.object({
   name: z

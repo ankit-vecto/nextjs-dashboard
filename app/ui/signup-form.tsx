@@ -27,7 +27,6 @@ export default function SignupForm() {
     register,
     undefined
   );
-  console.log(errorMessage, "errorserrorserrors");
   const [user, setUser] = useState<User>({
     name: "",
     email: "",
