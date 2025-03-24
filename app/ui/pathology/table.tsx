@@ -34,7 +34,7 @@ export default async function PathologyReportsTable({
               <line x1="12" y1="3" x2="12" y2="21" />
             </svg>
             <h1 className="mt-4 text-lg font-semibold">No Reports Available</h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 text-center">
               No pathology reports found. Please add a new report to get
               started.
             </p>
@@ -59,6 +59,7 @@ export default async function PathologyReportsTable({
                       <div className="flex justify-end gap-3">
                         <UptateReport id={report.id} />
                         <Deletereport id={report.id} />
+                        <ViewDetails id={report.id} />
                       </div>
                     </div>
                   </div>
@@ -110,17 +111,18 @@ export default async function PathologyReportsTable({
                     <th className="px-3 py-5 text-sm font-medium">
                       Date of Test
                     </th>
-                    {/*<th className="px-3 py-5 text-sm font-medium">
+                    <th className="px-3 py-5 text-sm font-medium">
                       Sample Collected By
                     </th>
-                    <th className="px-3 py-5 text-sm font-medium">
+                    {/* <th className="px-3 py-5 text-sm font-medium">
                       Sample Collection Date & Time
-                    </th>
+                    </th> */}
                     <th className="relative py-3 pl-6 pr-3">
                       <span className="sr-only">Edit</span>
-                    </th> */}
+                    </th>
                   </tr>
                 </thead>
+
                 <tbody className="bg-white">
                   {reports?.map((report, index) => (
                     <tr
@@ -148,10 +150,10 @@ export default async function PathologyReportsTable({
                       <td className="whitespace-nowrap px-3 py-3">
                         {new Date(report.test_date).toLocaleDateString()}
                       </td>
-                      {/* <td className="whitespace-nowrap px-3 py-3">
+                      <td className="whitespace-nowrap px-3 py-3">
                         {report.collected_by}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-3">
+                      {/* <td className="whitespace-nowrap px-3 py-3">
                         {format(
                           new Date(report.collection_date),
                           "dd/MM/yyyy HH:mm a"

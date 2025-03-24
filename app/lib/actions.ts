@@ -185,8 +185,6 @@ export default async function handleUpdateReport(
   report: PathologyReport,
   id: string
 ) {
-  console.log(report, "update");
-
   try {
     await sql`UPDATE pathology_reports SET
             name = ${report.name},

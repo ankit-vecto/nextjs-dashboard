@@ -273,13 +273,13 @@ const EditReportFrom = ({
       <div className="flex w-full justify-end gap-5">
         <Link
           href="/dashboard/pathology"
-          className="flex h-10 items-center rounded-lg mt-4 bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+          className="flex items-center justify-center rounded-lg mt-4 bg-gray-100 px-6 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200 w-40"
         >
           Back
         </Link>
         <button
           type="submit"
-          className=" bg-blue-500 text-white p-2 rounded-lg mt-4"
+          className="flex items-center justify-center bg-blue-500 text-white rounded-lg mt-4 px-6 py-2 text-sm font-medium w-40"
         >
           Save Report
         </button>
