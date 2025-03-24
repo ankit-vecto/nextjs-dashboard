@@ -1,17 +1,35 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import { PathologyReport } from "@/app/lib/definitions";
 import { format } from "date-fns";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const ReportTable = ({ details }: { details: PathologyReport }) => {
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  const generatePDF = async () => {
+    if (!tableRef.current) return;
+
+    const canvas = await html2canvas(tableRef.current, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const imgWidth = 190;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+    pdf.save("Pathology_Report.pdf");
+  };
+
   return (
     <div className="max-w-2xl mx-auto bg-white border shadow-lg rounded-lg">
-      <div className="bg-blue-500 text-white text-center py-4 rounded-t-lg">
-        <h1 className="text-2xl font-semibold">Pathology Report</h1>
-      </div>
+      <div ref={tableRef} className="p-6 bg-white">
+        <div className="bg-blue-500 text-white text-center py-4 rounded-t-lg">
+          <h1 className="text-2xl font-semibold">Pathology Report</h1>
+        </div>
 
-      <div className="p-6">
         <table className="w-full border border-gray-300">
           <tbody>
             {[
@@ -51,7 +69,7 @@ const ReportTable = ({ details }: { details: PathologyReport }) => {
 
       <div className="flex justify-end p-6">
         <button
-          onClick={() => window.print()}
+          onClick={generatePDF}
           className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
         >
           Download PDF
